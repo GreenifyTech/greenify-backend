@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS user_profiles (
+id INT AUTO_INCREMENT PRIMARY KEY,
+user_id INT UNIQUE NOT NULL,
+full_name VARCHAR(255) NOT NULL,
+phone VARCHAR(20) NOT NULL,
+address VARCHAR(255) NOT NULL,
+city VARCHAR(100),
+postal_code VARCHAR(20),
+profile_image VARCHAR(255),
+date_of_birth DATE,
+gender VARCHAR(20),
+preferred_language VARCHAR(10) DEFAULT 'en',
+default_address_id INT,
+is_profile_completed BOOLEAN DEFAULT FALSE,
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+
+);
+

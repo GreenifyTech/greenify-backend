@@ -93,6 +93,14 @@ def soft_delete_product(db: Session, product_id: int) -> None:
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+
+    if product.image_public_id:
+        from app.services.cloudinary_service import delete_image
+        try:
+            delete_image(product.image_public_id)
+        except Exception:
+            pass
+            
     product.is_active = False
     db.commit()
 

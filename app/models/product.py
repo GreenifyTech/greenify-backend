@@ -21,6 +21,7 @@ class Product(Base):
         Integer, nullable=False, server_default=text("0")
     )
     image_url = Column(String(500), nullable=True)
+    image_public_id = Column(String(200), nullable=True)
     is_active = Column(
         Boolean, nullable=False, server_default=text("true")
     )

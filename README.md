@@ -1,231 +1,157 @@
-# 🌱 Greenify Backend
+# 🌱 GREENIFY — Smart Plant Care & E-Commerce System
 
-A production-ready backend powering the **Greenify platform** — a smart ecosystem for plant care, customization, and e-commerce.
-
-Built with **FastAPI** and designed with clean architecture principles, this backend delivers secure authentication, scalable APIs, and real-time business insights through an advanced admin dashboard.
+🎓 **Graduation Project — Helwan National University**
+Faculty of Commerce & Business Administration
+Business Informatics & Digital Transformation (BIDT)
 
 ---
 
-## ✨ Key Features
+## 👨‍💻 Team Members
 
-🔐 **Authentication & Security**
+| Name                    | ID        |
+| ----------------------- | --------- |
+| Youssef Tarek Mohammed  | 971221408 |
+| Khalid Samy Abd-Elzaher | 971221103 |
+| Mahmoud Ahmed Saad      | 971221304 |
+| Hesham Amr Mohammed     | 971221386 |
+| Mariam Hossam           | 971221320 |
+| Nada Mohamed            | 971221366 |
 
-* JWT-based authentication system
-* Role-based access control (Admin / User)
-* Secure credential validation
+---
 
-🛍 **Product Management**
+## 📌 Project Overview
 
-* Full CRUD operations
-* Structured product catalog
-* Ready for media integration (images via cloud storage)
+**Greenify** is a full-stack smart platform that combines:
 
-📦 **Order System**
+🌿 Plant care assistance
+🛍 E-commerce system
+💐 Bouquet customization
+🤖 AI-powered plant diagnosis
 
-* Create and manage orders
-* User-specific order history
-* Order status tracking (pending, shipped, delivered, etc.)
+The system is designed to help users **buy plants, care for them, and customize floral arrangements**, while also providing intelligent recommendations and diagnostics.
 
-📊 **Admin Dashboard**
+---
 
-* Total orders & revenue tracking
-* Order status analytics
-* Top-selling products insights
-* Recent orders monitoring
+## 🧠 System Concept
 
-⚙️ **Clean Architecture**
+Greenify is built as a **complete digital ecosystem** consisting of:
 
-* Separation of concerns (routers, services, models)
-* Scalable and maintainable structure
+* Customer platform (shopping + plant care)
+* Admin dashboard (management & analytics)
+* AI module (plant disease diagnosis)
+
+It follows a **modern client-server architecture** using:
+
+* Frontend (React + Vite)
+* Backend (FastAPI)
+* Database (MySQL)
+
+---
+
+## 🏗 System Architecture
+
+The system follows a layered architecture:
+
+* **Client Layer** → React Application
+* **API Layer** → FastAPI (RESTful APIs)
+* **Data Layer** → MySQL Database
+
+With:
+
+* JWT Authentication
+* Role-Based Access Control
+* Clean Architecture (Services / Routers / Models)
+
+---
+
+## ✨ Core Features
+
+### 🔐 Authentication System
+
+* Secure login & registration
+* JWT-based authentication
+* Role-based authorization (Admin / User)
+
+### 🛍 E-Commerce System
+
+* Product browsing & filtering
+* Cart management
+* Order placement & tracking
+
+### 💐 Bouquet Builder
+
+* Customize flowers & colors
+* Dynamic price calculation
+* Save & manage custom bouquets
+
+### 🤖 AI Plant Doctor
+
+* Diagnose plant diseases from symptoms
+* Suggest causes & treatments
+* Confidence-based results
+
+### 📊 Admin Dashboard
+
+* Manage products, users, and orders
+* View analytics & statistics
+* Monitor system performance
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer             | Technology |
-| ----------------- | ---------- |
-| Backend Framework | FastAPI    |
-| Database          | MySQL      |
-| ORM               | SQLAlchemy |
-| Authentication    | JWT        |
-| Validation        | Pydantic   |
-| Server            | Uvicorn    |
+| Layer          | Technology   |
+| -------------- | ------------ |
+| Frontend       | React + Vite |
+| Backend        | FastAPI      |
+| Database       | MySQL        |
+| ORM            | SQLAlchemy   |
+| Authentication | JWT          |
+| Styling        | Tailwind CSS |
 
 ---
 
-## 📂 Project Structure
+## 🚀 Project Status
 
-```bash
-greenify-backend/
-│
-├── app/
-│   ├── core/        # Config, security, dependencies
-│   ├── models/      # Database models
-│   ├── schemas/     # Pydantic schemas
-│   ├── routers/     # API routes
-│   ├── services/    # Business logic
-│   └── main.py      # App entry point
-│
-├── create_tables.py
-├── requirements.txt
-└── .env
-```
+✅ Fully implemented system
+✅ End-to-end functionality
+✅ Ready for demonstration
+✅ Designed for scalability
 
 ---
 
-## 🚀 Getting Started
+## 📸 API Documentation
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/GreenifyTech/greenify-backend.git
-cd greenify-backend
-```
+Swagger UI:
+http://localhost:8000/api/docs
 
 ---
 
-### 2. Create virtual environment
+## 🎯 Project Objectives
 
-```bash
-python -m venv .venv
-```
-
-Activate:
-
-* Windows:
-
-```bash
-.venv\Scripts\activate
-```
-
-* macOS/Linux:
-
-```bash
-source .venv/bin/activate
-```
+* Build a **real-world scalable system**
+* Apply **full-stack development concepts**
+* Integrate **AI-based features**
+* Deliver a **practical business solution**
 
 ---
 
-### 3. Install dependencies
+## 🔮 Future Enhancements
 
-```bash
-pip install -r requirements.txt
-```
-
----
-
-### 4. Setup Environment Variables
-
-Create `.env` file:
-
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=greenify_db
-DB_USER=root
-DB_PASSWORD=your_password
-
-SECRET_KEY=your_secret_key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=1440
-
-FRONTEND_URL=http://localhost:5173
-```
+* Payment gateway integration
+* AI model (ML-based instead of rule-based)
+* Mobile application
+* Cloud deployment (Docker + CI/CD)
 
 ---
 
-### 5. Initialize Database
+## 📍 Developed By
 
-```bash
-python create_tables.py
-```
-
----
-
-### 6. Run the server
-
-```bash
-uvicorn app.main:app --reload
-```
+Greenify Team — Helwan National University
+Class of 2026 🎓
 
 ---
 
-## 📚 API Documentation
+## ⭐ Support
 
-Once running:
-
-* Swagger UI 👉 http://localhost:8000/docs
-* ReDoc 👉 http://localhost:8000/redoc
-
-Interactive testing available directly from the browser.
-
----
-
-## 🔗 Core API Endpoints
-
-### 🔐 Authentication
-
-* `POST /api/auth/register`
-* `POST /api/auth/login`
-* `POST /api/auth/token`
-
----
-
-### 🛍 Products
-
-* `GET /api/products`
-* `GET /api/products/{product_id}`
-* `POST /api/products` *(Admin only)*
-
----
-
-### 📦 Orders
-
-* `POST /api/orders`
-* `GET /api/orders/me`
-* Pagination & filtering supported
-
----
-
-### 📊 Admin
-
-* `GET /api/admin/dashboard`
-* `GET /api/admin/stats`
-
----
-
-## 🧠 System Highlights
-
-* Optimized database queries using SQLAlchemy
-* Pagination for scalable data handling
-* Clean dependency injection using FastAPI Depends
-* Structured response models for consistency
-* Ready for frontend integration (React)
-
----
-
-## 🔮 Future Roadmap
-
-* 🔄 Redis caching for performance optimization
-* 💳 Payment gateway integration (Stripe / Paymob)
-* 🧪 Unit & integration testing (pytest)
-* 🐳 Docker support for deployment
-* ☁️ Cloud deployment (Railway / AWS)
-
----
-
-## 👨‍💻 Author
-
-**Khalid Samy**
-Backend Developer | Digital Transformation Student
-
-📧 [khalidsmhran@gmail.com](mailto:khalidsmhran@gmail.com)
-📍 Giza, Egypt
-
----
-
-## ⭐ Contribution
-
-Feel free to fork, contribute, or suggest improvements.
-
-If you like the project, don’t forget to ⭐ the repo!
+If you like this project, give it a ⭐

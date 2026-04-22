@@ -27,6 +27,7 @@ class ProductCreate(BaseModel):
     price: Decimal
     stock_quantity: int = 0
     image_url: Optional[str] = None
+    image_public_id: Optional[str] = None
 
 
 class ProductUpdate(BaseModel):

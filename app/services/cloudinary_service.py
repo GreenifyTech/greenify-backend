@@ -18,13 +18,19 @@ def upload_image(file: Union[bytes, UploadFile], is_admin: bool = False) -> dict
 
     max_size = ADMIN_MAX_SIZE if is_admin else USER_MAX_SIZE
 
-    if isinstance(file, UploadFile):
+    # More robust check for UploadFile
+    if hasattr(file, "file") and hasattr(file, "content_type"):
         if file.content_type not in ALLOWED_IMAGE_TYPES:
             raise ValueError(f"Invalid file type. Allowed types: image/jpeg, image/png, image/jpg")
         
         file_bytes = file.file.read()
+        file.file.seek(0)
     else:
         file_bytes = file
+
+    # Ensure file_bytes is a bytes-like object that has len()
+    if not isinstance(file_bytes, (bytes, bytearray)):
+        raise ValueError(f"Invalid file data. Expected bytes, got {type(file_bytes).__name__}")
 
     if len(file_bytes) > max_size:
         allowed_mb = max_size // (1024 * 1024)

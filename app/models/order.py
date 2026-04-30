@@ -21,7 +21,7 @@ class Order(Base):
     payment_method = Column(String(50), nullable=False)
     payment_status = Column(String(20), nullable=False, server_default=text("'unpaid'"))
     payment_proof = Column(String(255), nullable=True)
-    payment_verified = Column(Boolean, default=False, server_default=text("0"))
+    payment_verified = Column(Boolean, default=False, server_default=text("false"))
     transaction_id = Column(String(100), nullable=True)
     shipping_address = Column(Text, nullable=False)
     notes = Column(Text, nullable=True)

@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -5,13 +6,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import engine, Base
 from app.routers import admin, ai_doctor, auth, bouquet, cart, categories, diagnosis, orders, products, profile, analytics, notifications
-import app.models # Ensure models are loaded
+import app.models 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
 
 app = FastAPI(
     title=settings.app_name,
     version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
+    lifespan=lifespan,
 )
 
 # CORS configuration

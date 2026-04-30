@@ -9,7 +9,9 @@ from app.config import settings
 
 Base = declarative_base()
 
-DATABASE_URL = (os.getenv("DATABASE_URL") or settings.database_url).replace("postgres://", "postgresql://")
+DATABASE_URL = os.getenv("DATABASE_URL") or settings.database_url
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 engine = create_engine(
     DATABASE_URL,

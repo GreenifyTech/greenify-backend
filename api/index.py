@@ -1,4 +1,1 @@
-from fastapi import FastAPI
-from app.main import app as fastapi_app
-
-app = fastapi_app
+from app.main import app

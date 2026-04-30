@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,22 +14,25 @@ app = FastAPI(
     redoc_url="/api/redoc",
 )
 
-# @app.on_event("startup")
-# def startup_event():
-#     # Create tables on startup if they don't exist
-#     Base.metadata.create_all(bind=engine)
-
-@app.get("/")
-def read_root():
-    return {"message": "Greenify API is running"}
+# CORS configuration
+CORS_ORIGINS = os.getenv("CORS_ORIGINS")
+if CORS_ORIGINS:
+    origins = [origin.strip() for origin in CORS_ORIGINS.split(",")]
+else:
+    origins = ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/")
+def read_root():
+    return {"message": "Greenify API is running"}
 
 app.include_router(auth.router)
 app.include_router(products.router)

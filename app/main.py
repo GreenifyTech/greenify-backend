@@ -1,4 +1,3 @@
-from contextlib import asynccontextmanager
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,17 +7,18 @@ from app.database import engine, Base
 from app.routers import admin, ai_doctor, auth, bouquet, cart, categories, diagnosis, orders, products, profile, analytics, notifications
 import app.models 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
+
+try:
     Base.metadata.create_all(bind=engine)
-    yield
+    print("✅ Tables created successfully")
+except Exception as e:
+    print("❌ Error creating tables:", e)
 
 app = FastAPI(
     title=settings.app_name,
     version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
-    lifespan=lifespan,
 )
 
 # CORS configuration

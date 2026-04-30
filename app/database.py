@@ -9,15 +9,14 @@ from app.config import settings
 
 Base = declarative_base()
 
-DATABASE_URL = os.getenv("DATABASE_URL", settings.database_url)
+DATABASE_URL = (os.getenv("DATABASE_URL") or settings.database_url).replace("postgres://", "postgresql://")
 
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-    pool_recycle=3600,
-    connect_args={"sslmode": "require"}  
+    pool_size=1,
+    max_overflow=0,
+    connect_args={"sslmode": "require"}
 )
 
 SessionLocal = sessionmaker(

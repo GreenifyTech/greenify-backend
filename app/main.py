@@ -13,10 +13,10 @@ app = FastAPI(
     redoc_url="/api/redoc",
 )
 
-@app.on_event("startup")
-def startup_event():
-    # Create tables on startup if they don't exist
-    Base.metadata.create_all(bind=engine)
+# @app.on_event("startup")
+# def startup_event():
+#     # Create tables on startup if they don't exist
+#     Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def read_root():

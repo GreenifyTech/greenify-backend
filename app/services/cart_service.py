@@ -1,14 +1,14 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.models.cart import Cart
+from app.models.cart_item import CartItem
 from app.models.product import Product
 from app.models.user import User
 from app.schemas.cart import CartAddItem, CartUpdateItem
 
 
 def get_cart(db: Session, user: User) -> dict:
-    items = db.query(Cart).filter(Cart.user_id == user.id).all()
+    items = db.query(CartItem).filter(CartItem.user_id == user.id).all()
     result = []
     total = 0.0
     for item in items:
@@ -40,27 +40,29 @@ def add_item(db: Session, user: User, payload: CartAddItem) -> None:
     )
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    if product.stock_quantity < payload.quantity:
+    
+    if product.stock < payload.quantity:
         raise HTTPException(status_code=400, detail="Insufficient stock")
 
     existing = (
-        db.query(Cart)
-        .filter(Cart.user_id == user.id, Cart.product_id == payload.product_id)
+        db.query(CartItem)
+        .filter(CartItem.user_id == user.id, CartItem.product_id == payload.product_id)
         .first()
     )
     if existing:
-        if product.stock_quantity < existing.quantity + payload.quantity:
+        if product.stock < existing.quantity + payload.quantity:
             raise HTTPException(status_code=400, detail="Insufficient stock")
         existing.quantity += payload.quantity
     else:
-        db.add(Cart(user_id=user.id, product_id=payload.product_id, quantity=payload.quantity))
+        db.add(CartItem(user_id=user.id, product_id=payload.product_id, quantity=payload.quantity))
     db.commit()
 
 
 def update_item(db: Session, user: User, item_id: int, payload: CartUpdateItem) -> None:
-    item = db.query(Cart).filter(Cart.id == item_id, Cart.user_id == user.id).first()
+    item = db.query(CartItem).filter(CartItem.id == item_id, CartItem.user_id == user.id).first()
     if not item:
         raise HTTPException(status_code=404, detail="Cart item not found")
+    
     if payload.quantity <= 0:
         db.delete(item)
         db.commit()
@@ -73,14 +75,16 @@ def update_item(db: Session, user: User, item_id: int, payload: CartUpdateItem) 
     )
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    if product.stock_quantity < payload.quantity:
+    
+    if product.stock < payload.quantity:
         raise HTTPException(status_code=400, detail="Insufficient stock")
+        
     item.quantity = payload.quantity
     db.commit()
 
 
 def remove_item(db: Session, user: User, item_id: int) -> None:
-    item = db.query(Cart).filter(Cart.id == item_id, Cart.user_id == user.id).first()
+    item = db.query(CartItem).filter(CartItem.id == item_id, CartItem.user_id == user.id).first()
     if not item:
         raise HTTPException(status_code=404, detail="Cart item not found")
     db.delete(item)
@@ -88,6 +92,5 @@ def remove_item(db: Session, user: User, item_id: int) -> None:
 
 
 def clear_cart(db: Session, user: User) -> None:
-    db.query(Cart).filter(Cart.user_id == user.id).delete()
+    db.query(CartItem).filter(CartItem.user_id == user.id).delete()
     db.commit()
-

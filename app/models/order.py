@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Index, Integer, Numeric, String, Text
+from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Index, Integer, Numeric, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import text
 
@@ -14,20 +14,15 @@ class Order(Base):
     )
     total_amount = Column(Numeric(10, 2), nullable=False)
     status = Column(
-        Enum("pending", "processing", "shipped", "delivered", "cancelled"),
+        String(20),
         nullable=False,
         server_default=text("'pending'"),
     )
-    payment_method = Column(
-        Enum("cash_on_delivery", "online_payment"),
-        nullable=False,
-        server_default=text("'cash_on_delivery'"),
-    )
-    payment_status = Column(
-        Enum("unpaid", "paid"),
-        nullable=False,
-        server_default=text("'unpaid'"),
-    )
+    payment_method = Column(String(50), nullable=False)
+    payment_status = Column(String(20), nullable=False, server_default=text("'unpaid'"))
+    payment_proof = Column(String(255), nullable=True)
+    payment_verified = Column(Boolean, default=False, server_default=text("0"))
+    transaction_id = Column(String(100), nullable=True)
     shipping_address = Column(Text, nullable=False)
     notes = Column(Text, nullable=True)
     created_at = Column(

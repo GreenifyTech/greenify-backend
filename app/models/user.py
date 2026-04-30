@@ -12,12 +12,18 @@ class User(Base):
     full_name = Column(String(100), nullable=False)
     email = Column(String(150), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
-    phone = Column(String(20), nullable=True)
+    phone = Column(String(50), nullable=True)
     address = Column(Text, nullable=True)
     role = Column(
         Enum("customer", "admin"),
         nullable=False,
         server_default=text("'customer'"),
+    )
+    is_admin = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
     )
     is_active = Column(
         Boolean,
@@ -36,7 +42,7 @@ class User(Base):
         server_onupdate=text("CURRENT_TIMESTAMP"),
     )
 
-    cart_items = relationship("Cart", back_populates="user", cascade="all, delete-orphan")
+    cart_items = relationship("CartItem", back_populates="user", cascade="all, delete-orphan")
     orders = relationship("Order", back_populates="user")
     bouquets = relationship("Bouquet", back_populates="user", cascade="all, delete-orphan")
     profile = relationship(

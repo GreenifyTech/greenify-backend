@@ -25,7 +25,7 @@ class Bouquet(Base):
     )
     notes = Column(Text, nullable=True)
     status = Column(
-        Enum("draft", "ordered"),
+        String(20),
         nullable=False,
         server_default=text("'draft'"),
     )

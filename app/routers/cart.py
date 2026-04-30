@@ -21,15 +21,17 @@ def cart_get(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    """Get all items in the user's cart."""
     return get_cart(db=db, user=user)
 
 
-@router.post("/", status_code=201)
+@router.post("/add", status_code=201)
 def cart_add(
     payload: CartAddItem,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    """Add a product to the cart. If it already exists, quantity is increased."""
     add_item(db=db, user=user, payload=payload)
     return {"message": "Item added to cart"}
 
@@ -41,6 +43,7 @@ def cart_update(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    """Update the quantity of an item in the cart."""
     update_item(db=db, user=user, item_id=item_id, payload=payload)
     return {"message": "Cart updated"}
 
@@ -51,6 +54,7 @@ def cart_remove(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    """Remove a specific item from the cart."""
     remove_item(db=db, user=user, item_id=item_id)
 
 
@@ -59,5 +63,5 @@ def cart_clear(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    """Clear the entire cart."""
     clear_cart(db=db, user=user)
-

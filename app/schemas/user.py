@@ -29,6 +29,7 @@ class UserResponse(BaseModel):
     phone: Optional[str] = None
     address: Optional[str] = None
     role: str
+    is_admin: bool
     is_active: bool
     created_at: datetime
     profile_image: Optional[str] = None

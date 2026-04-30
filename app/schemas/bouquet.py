@@ -11,6 +11,10 @@ class BouquetCreate(BaseModel):
     colors: List[str]
     total_quantity: int = 1
     notes: Optional[str] = None
+    # Shipping info for immediate order creation
+    shipping_address: str
+    phone: str
+    payment_method: str = "cash_on_delivery"
 
 
 class BouquetResponse(BaseModel):

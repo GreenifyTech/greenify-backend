@@ -24,6 +24,5 @@ class CartItem(Base):
         UniqueConstraint("user_id", "product_id", name="uq_cart_items_user_product"),
     )
 
-    user = relationship("User")
-    product = relationship("Product")
-
+    user = relationship("User", back_populates="cart_items")
+    product = relationship("Product", back_populates="cart_items")

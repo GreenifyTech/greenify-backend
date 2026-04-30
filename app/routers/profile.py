@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session
@@ -8,6 +8,7 @@ from app.database import get_db
 from app.models.user import User
 from app.models.user_profile import UserProfile
 from app.schemas.user_profile import UserProfileResponse, UserProfileUpdate
+from app.services.cloudinary_service import upload_image
 
 router = APIRouter(prefix="/api/profile", tags=["Profile"])
 
@@ -65,6 +66,9 @@ def update_my_profile(
 
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(profile, field, value)
+        # Sync full_name back to User model if it's updated
+        if field == "full_name":
+            user.full_name = value
 
     required_filled = all(
         [
@@ -78,6 +82,26 @@ def update_my_profile(
     db.commit()
     db.refresh(profile)
     return profile
+
+
+@router.post("/me/image/", response_model=UserProfileResponse)
+def upload_my_profile_image(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    try:
+        upload_result = upload_image(file)
+        image_url = upload_result.get("url")
+        
+        profile = _get_or_create_profile(db=db, user=user)
+        profile.profile_image = image_url
+        db.commit()
+        db.refresh(profile)
+        return profile
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
 
 @router.post("/upload-image", response_model=UserProfileResponse)

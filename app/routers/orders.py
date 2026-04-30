@@ -1,22 +1,29 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
 from app.database import get_db
 from app.models.user import User
-from app.schemas.order import OrderCreate, OrderResponse
-from app.services.order_service import get_my_orders, get_order_by_id, place_order
+from app.schemas.order import OrderCreate, OrderResponse, OrderCreateResponse
+from app.services.order_service import get_my_orders, get_order_by_id, place_order, upload_payment_proof
 
 router = APIRouter(prefix="/api/orders", tags=["Orders"])
 
 
-@router.post("/", response_model=OrderResponse, status_code=201)
+@router.post("/", response_model=OrderCreateResponse, status_code=201)
 def orders_place(
     payload: OrderCreate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    return place_order(db=db, user=user, payload=payload)
+    order = place_order(db=db, user=user, payload=payload)
+    return {
+        "order_id": order.id, 
+        "total": order.total_amount,
+        "payment_method": order.payment_method,
+        "payment_status": order.payment_status,
+        "payment_details": getattr(order, "payment_details", None)
+    }
 
 from enum import Enum
 from typing import Optional
@@ -24,7 +31,8 @@ from fastapi import Query
 from pydantic import BaseModel
 from sqlalchemy.orm import selectinload
 from sqlalchemy import func
-from app.models.order import Order
+from app.models.order import Order, OrderItem
+from app.models.product import Product
 from app.schemas.order import OrderResponse
 
 class OrderStatus(str, Enum):
@@ -59,7 +67,9 @@ def orders_me(
 
     items = (
         base_query
-        .options(selectinload(Order.items))
+        .options(
+            selectinload(Order.items).selectinload(OrderItem.product).selectinload(Product.category)
+        )
         .order_by(Order.created_at.desc())
         .offset((page - 1) * page_size)
         .limit(page_size)
@@ -81,4 +91,18 @@ def orders_get(
     user: User = Depends(get_current_user),
 ):
     return get_order_by_id(db=db, user=user, order_id=order_id)
+
+
+@router.post("/{order_id}/upload-proof")
+def orders_upload_proof(
+    order_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    proof_url = upload_payment_proof(db=db, user=user, order_id=order_id, file=file)
+    return {
+        "message": "Proof uploaded successfully",
+        "proof_url": proof_url
+    }
 

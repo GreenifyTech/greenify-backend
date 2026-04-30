@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.models.bouquet import Bouquet
+from app.models.order import Order, OrderItem
 from app.models.user import User
 from app.schemas.bouquet import BouquetCreate
 
@@ -27,10 +28,14 @@ def calculate_price(flower_types: list[str], quantity: int) -> Decimal:
     return Decimal(str(round(price, 2))).quantize(Decimal("0.01"))
 
 
+
+
 def create_bouquet(db: Session, user: User, payload: BouquetCreate) -> Bouquet:
     if payload.total_quantity <= 0:
         raise HTTPException(status_code=400, detail="total_quantity must be positive")
     price = calculate_price(payload.flower_types, payload.total_quantity)
+    
+    # 1. Create the Bouquet
     bouquet = Bouquet(
         user_id=user.id,
         name=payload.name,
@@ -39,8 +44,35 @@ def create_bouquet(db: Session, user: User, payload: BouquetCreate) -> Bouquet:
         total_quantity=payload.total_quantity,
         estimated_price=price,
         notes=payload.notes,
+        status="ordered" # Set to ordered immediately
     )
     db.add(bouquet)
+    db.flush() # Get the bouquet ID
+
+    # 2. Create the Order
+    order = Order(
+        user_id=user.id,
+        total_amount=price,
+        status="pending",
+        payment_method=payload.payment_method,
+        payment_status="unpaid",
+        shipping_address=payload.shipping_address,
+        notes=f"Custom Bouquet Order: {payload.name}. " + (payload.notes or "")
+    )
+    db.add(order)
+    db.flush() # Get the order ID
+
+    # 3. Create Order Item
+    item = OrderItem(
+        order_id=order.id,
+        bouquet_id=bouquet.id,
+        item_name=f"Custom Bouquet: {payload.name}",
+        unit_price=price,
+        quantity=1,
+        subtotal=price
+    )
+    db.add(item)
+    
     db.commit()
     db.refresh(bouquet)
     return bouquet

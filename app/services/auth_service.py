@@ -36,7 +36,8 @@ def register_user(db: Session, payload: UserRegister) -> User:
         )
         db.add(profile)
         db.commit()
-    except ProgrammingError:
+    except Exception as e:
+        print(f"PROFILE CREATION FAILED: {e}")
         db.rollback()
     return user
 
@@ -68,6 +69,7 @@ def login_user_with_credentials(db: Session, email: str, password: str) -> Token
         "phone": user.phone,
         "address": user.address,
         "role": user.role,
+        "is_admin": user.is_admin,
         "is_active": user.is_active,
         "created_at": user.created_at,
         "profile_image": None
@@ -93,5 +95,24 @@ def toggle_user_active(db: Session, user_id: int) -> dict:
     return {"message": f"User {'activated' if user.is_active else 'deactivated'}"}
 
 
-def list_customers(db: Session) -> list[User]:
-    return db.query(User).filter(User.role == "customer").all()
+def list_all_users(db: Session) -> list[User]:
+    return db.query(User).all()
+
+
+def ban_user(db: Session, user_id: int) -> dict:
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.is_active = False
+    db.commit()
+    return {"message": "User banned successfully"}
+
+
+def make_user_admin(db: Session, user_id: int) -> dict:
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.is_admin = True
+    user.role = "admin"
+    db.commit()
+    return {"message": "User is now an admin"}

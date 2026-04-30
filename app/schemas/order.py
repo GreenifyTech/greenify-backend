@@ -3,6 +3,7 @@ from decimal import Decimal
 from typing import List, Optional
 
 from pydantic import BaseModel
+from app.schemas.product import ProductResponse
 
 
 class OrderItemCreate(BaseModel):
@@ -12,10 +13,14 @@ class OrderItemCreate(BaseModel):
 
 
 class OrderCreate(BaseModel):
+    items: List[OrderItemCreate]
     payment_method: str = "cash_on_delivery"
-    shipping_address: str
+    transaction_id: Optional[str] = None
+    shipping_address: Optional[str] = "Default Address"
     notes: Optional[str] = None
 
+
+from app.schemas.bouquet import BouquetResponse
 
 class OrderItemResponse(BaseModel):
     id: int
@@ -23,6 +28,8 @@ class OrderItemResponse(BaseModel):
     unit_price: Decimal
     quantity: int
     subtotal: Decimal
+    product: Optional[ProductResponse] = None
+    bouquet: Optional[BouquetResponse] = None
 
     class Config:
         from_attributes = True
@@ -34,6 +41,9 @@ class OrderResponse(BaseModel):
     status: str
     payment_method: str
     payment_status: str
+    payment_proof: Optional[str] = None
+    payment_verified: bool = False
+    transaction_id: Optional[str] = None
     shipping_address: str
     notes: Optional[str]
     items: List[OrderItemResponse]
@@ -41,4 +51,12 @@ class OrderResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class OrderCreateResponse(BaseModel):
+    order_id: int
+    total: Decimal
+    payment_method: str
+    payment_status: str
+    payment_details: Optional[dict] = None
 

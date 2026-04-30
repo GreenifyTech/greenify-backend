@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import admin, ai_doctor, auth, bouquet, cart, categories, orders, products, profile
+from app.database import engine, Base
+from app.routers import admin, ai_doctor, auth, bouquet, cart, categories, diagnosis, orders, products, profile, analytics, notifications
+import app.models # Ensure models are loaded
 
 app = FastAPI(
     title=settings.app_name,
@@ -11,14 +13,18 @@ app = FastAPI(
     redoc_url="/api/redoc",
 )
 
+@app.on_event("startup")
+def startup_event():
+    # Create tables on startup if they don't exist
+    Base.metadata.create_all(bind=engine)
+
+@app.get("/")
+def read_root():
+    return {"message": "Greenify API is running"}
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,7 +38,10 @@ app.include_router(orders.router)
 app.include_router(bouquet.router)
 app.include_router(ai_doctor.router)
 app.include_router(profile.router)
+app.include_router(diagnosis.router)
 app.include_router(admin.router)
+app.include_router(analytics.router)
+app.include_router(notifications.router)
 
 
 @app.get("/api/health")

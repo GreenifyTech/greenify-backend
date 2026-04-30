@@ -19,15 +19,15 @@ class UserProfileCreate(BaseModel):
 
 
 class UserProfileUpdate(BaseModel):
-    full_name: str
-    phone: str
-    address: str
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
     city: Optional[str] = None
     postal_code: Optional[str] = None
     profile_image: Optional[str] = None
     date_of_birth: Optional[date] = None
     gender: Optional[Literal["male", "female"]] = None
-    preferred_language: str = "en"
+    preferred_language: Optional[str] = None
     default_address_id: Optional[int] = None
 
 

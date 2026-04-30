@@ -15,7 +15,7 @@ class User(Base):
     phone = Column(String(50), nullable=True)
     address = Column(Text, nullable=True)
     role = Column(
-        Enum("customer", "admin"),
+        Enum("customer", "admin", name="user_role_enum"),
         nullable=False,
         server_default=text("'customer'"),
     )

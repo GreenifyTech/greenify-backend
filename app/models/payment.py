@@ -12,11 +12,11 @@ class Payment(Base):
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False, unique=True)
     amount = Column(Numeric(10, 2), nullable=False)
     method = Column(
-        Enum("cash_on_delivery", "online_payment"),
+        Enum("cash_on_delivery", "online_payment", name="payment_method_enum"),
         nullable=False,
     )
     status = Column(
-        Enum("pending", "paid", "failed", "refunded"),
+        Enum("pending", "paid", "failed", "refunded", name="payment_status_enum"),
         nullable=False,
         server_default=text("'pending'"),
     )

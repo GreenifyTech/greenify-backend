@@ -14,7 +14,7 @@ class AIConsultation(Base):
     possible_disease = Column(Text, nullable=False)
     cause = Column(Text, nullable=False)
     treatment = Column(Text, nullable=False)
-    confidence = Column(Enum("high", "medium", "low"), nullable=False)
+    confidence = Column(Enum("high", "medium", "low", name="confidence_level_enum"), nullable=False)
     disclaimer = Column(Text, nullable=False)
     created_at = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 

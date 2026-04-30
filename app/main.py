@@ -9,6 +9,7 @@ import app.models
 
 
 try:
+    print("Base metadata tables:", Base.metadata.tables.keys())
     Base.metadata.create_all(bind=engine)
     print("✅ Tables created successfully")
 except Exception as e:

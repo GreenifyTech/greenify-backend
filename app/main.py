@@ -24,27 +24,25 @@ app = FastAPI(
 
 # CORS configuration
 _extra_origins = os.getenv("CORS_ORIGINS", "")
-_extra_list = [o.strip() for o in _extra_origins.split(",") if o.strip()]
+_extra_list = [o.strip().rstrip("/") for o in _extra_origins.split(",") if o.strip()]
 
-origins: list[str] = list(
-    dict.fromkeys(
-        [
-            settings.frontend_url,
-            "https://greenify-frontend-five.vercel.app",
-            "https://greenify-app.vercel.app",
-            "http://localhost:5173",
-            "http://localhost:3000",
-        ]
-        + _extra_list
-    )
-)
+origins = [
+    settings.frontend_url.rstrip("/"),
+    "https://greenify-frontend-five.vercel.app",
+    "https://greenify-app.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+] + _extra_list
+
+# Deduplicate origins while preserving order
+origins = list(dict.fromkeys(origins))
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 

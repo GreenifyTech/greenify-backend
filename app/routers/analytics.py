@@ -6,6 +6,7 @@ from app.models.product import Product
 from app.models.order import Order, OrderItem
 from app.models.analytics_logs import SearchLog, DiagnosticLog
 from app.models.user import User
+from app.core.deps import get_current_admin
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 
@@ -16,7 +17,11 @@ def get_date_filter(days: int):
     return datetime.utcnow() - timedelta(days=days)
 
 @router.get("/summary")
-def get_analytics_summary(days: int = 7, db: Session = Depends(get_db)):
+def get_analytics_summary(
+    days: int = 7,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
     date_limit = get_date_filter(days)
     
     orders_query = db.query(Order).filter(Order.status != "CANCELLED")
@@ -40,7 +45,11 @@ def get_analytics_summary(days: int = 7, db: Session = Depends(get_db)):
     }
 
 @router.get("/top-medicines")
-def get_top_medicines(days: int = 7, db: Session = Depends(get_db)):
+def get_top_medicines(
+    days: int = 7,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
     date_limit = get_date_filter(days)
     
     query = (
@@ -59,7 +68,11 @@ def get_top_medicines(days: int = 7, db: Session = Depends(get_db)):
     return [{"name": name, "value": total_sold} for name, total_sold in top_selling]
 
 @router.get("/top-searches")
-def get_top_searches(days: int = 7, db: Session = Depends(get_db)):
+def get_top_searches(
+    days: int = 7,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
     date_limit = get_date_filter(days)
     
     query = db.query(SearchLog.query, func.count(SearchLog.id).label("count")).filter(SearchLog.source == "encyclopedia")
@@ -72,7 +85,11 @@ def get_top_searches(days: int = 7, db: Session = Depends(get_db)):
     return [{"name": query, "value": count} for query, count in top_searches]
 
 @router.get("/recent-diagnostics")
-def get_recent_diagnostics(days: int = 7, db: Session = Depends(get_db)):
+def get_recent_diagnostics(
+    days: int = 7,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
     date_limit = get_date_filter(days)
     query = db.query(DiagnosticLog)
     
@@ -83,7 +100,11 @@ def get_recent_diagnostics(days: int = 7, db: Session = Depends(get_db)):
     return logs
 
 @router.get("/sales-trend")
-def get_sales_trend(days: int = 7, db: Session = Depends(get_db)):
+def get_sales_trend(
+    days: int = 7,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
     date_limit = get_date_filter(days)
     
     query = (

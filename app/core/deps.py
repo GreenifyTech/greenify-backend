@@ -1,7 +1,9 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from jose import ExpiredSignatureError, JWTError, jwt
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.core.security import decode_token
 from app.database import get_db
 from app.models.user import User
@@ -13,6 +15,21 @@ def get_current_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme),
 ) -> User:
+    try:
+        jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired. Please log in again.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     payload = decode_token(token)
     if not payload or "sub" not in payload:
         raise HTTPException(
@@ -25,7 +42,7 @@ def get_current_user(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="User not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
     if not user.is_active:

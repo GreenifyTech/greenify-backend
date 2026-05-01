@@ -30,6 +30,8 @@ origins: list[str] = list(
     dict.fromkeys(
         [
             settings.frontend_url,
+            "https://greenify-frontend-five.vercel.app",
+            "https://greenify-app.vercel.app",
             "http://localhost:5173",
             "http://localhost:3000",
         ]
@@ -40,6 +42,7 @@ origins: list[str] = list(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

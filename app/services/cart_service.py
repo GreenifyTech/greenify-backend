@@ -12,8 +12,9 @@ def get_cart(db: Session, user: User) -> dict:
     result = []
     total = 0.0
     for item in items:
-        price = float(item.product.price)
-        subtotal = price * item.quantity
+        # Use discount price if available, otherwise regular price
+        effective_price = float(item.product.discount_price) if item.product.discount_price and item.product.discount_price < item.product.price else float(item.product.price)
+        subtotal = effective_price * item.quantity
         total += subtotal
         result.append(
             {
@@ -21,7 +22,8 @@ def get_cart(db: Session, user: User) -> dict:
                 "product_id": item.product_id,
                 "product_name": item.product.name,
                 "product_image": item.product.image_url,
-                "price": price,
+                "price": float(item.product.price),
+                "discount_price": float(item.product.discount_price) if item.product.discount_price else None,
                 "quantity": item.quantity,
                 "subtotal": round(subtotal, 2),
             }

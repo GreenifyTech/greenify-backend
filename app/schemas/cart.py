@@ -1,14 +1,11 @@
 from pydantic import BaseModel
 
-
 class CartAddItem(BaseModel):
     product_id: int
     quantity: int = 1
 
-
 class CartUpdateItem(BaseModel):
     quantity: int
-
 
 class CartItemResponse(BaseModel):
     id: int
@@ -16,12 +13,11 @@ class CartItemResponse(BaseModel):
     product_name: str
     product_image: str | None
     price: float
+    discount_price: float | None
     quantity: int
     subtotal: float
-
 
 class CartResponse(BaseModel):
     items: list[CartItemResponse]
     total: float
     count: int
-

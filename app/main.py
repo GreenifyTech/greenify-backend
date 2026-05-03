@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import engine, Base
-from app.routers import admin, ai_doctor, auth, bouquet, cart, categories, diagnosis, orders, products, profile, analytics, notifications
+from app.routers import admin, ai_doctor, auth, bouquet, cart, categories, diagnosis, orders, products, profile, analytics, notifications, users
 import app.models 
 
 
@@ -63,6 +63,7 @@ app.include_router(diagnosis.router)
 app.include_router(admin.router)
 app.include_router(analytics.router)
 app.include_router(notifications.router)
+app.include_router(users.router)
 
 
 @app.get("/api/health")

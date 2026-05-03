@@ -43,3 +43,7 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     user: UserResponse
 
+
+class UserRoleUpdate(BaseModel):
+    role: str
+

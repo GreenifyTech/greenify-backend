@@ -2,6 +2,7 @@ from typing import Optional
 
 from fastapi import HTTPException
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.category import Category
@@ -89,20 +90,44 @@ def get_product(db: Session, product_id: int) -> Product:
     return product
 
 
+def _get_unique_slug(db: Session, name: str, exclude_id: Optional[int] = None) -> str:
+    base_slug = slugify(name)
+    slug = base_slug
+    counter = 1
+    query = db.query(Product).filter(Product.slug == slug)
+    if exclude_id:
+        query = query.filter(Product.id != exclude_id)
+    
+    while query.first():
+        slug = f"{base_slug}-{counter}"
+        query = db.query(Product).filter(Product.slug == slug)
+        if exclude_id:
+            query = query.filter(Product.id != exclude_id)
+        counter += 1
+    return slug
+
+
 def create_product(db: Session, payload: ProductCreate) -> Product:
     category = db.query(Category).filter(Category.id == payload.category_id).first()
     if not category:
         raise HTTPException(status_code=400, detail="Invalid category_id")
     
     product_data = payload.model_dump()
-    # Generate slug from name
-    product_data["slug"] = slugify(product_data["name"])
+    # Generate unique slug from name
+    product_data["slug"] = _get_unique_slug(db, product_data["name"])
     
     product = Product(**product_data)
     db.add(product)
-    db.commit()
-    db.refresh(product)
-    return product
+    try:
+        db.commit()
+        db.refresh(product)
+        return product
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail=f"Database integrity error: {str(e.orig) if hasattr(e, 'orig') else str(e)}"
+        )
 
 
 def update_product(db: Session, product_id: int, payload: ProductUpdate) -> Product:
@@ -118,14 +143,21 @@ def update_product(db: Session, product_id: int, payload: ProductUpdate) -> Prod
             raise HTTPException(status_code=400, detail="Invalid category_id")
             
     if "name" in data:
-        data["slug"] = slugify(data["name"])
+        data["slug"] = _get_unique_slug(db, data["name"], exclude_id=product_id)
             
     for field, value in data.items():
         setattr(product, field, value)
         
-    db.commit()
-    db.refresh(product)
-    return product
+    try:
+        db.commit()
+        db.refresh(product)
+        return product
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail=f"Database integrity error: {str(e.orig) if hasattr(e, 'orig') else str(e)}"
+        )
 
 
 def soft_delete_product(db: Session, product_id: int) -> None:

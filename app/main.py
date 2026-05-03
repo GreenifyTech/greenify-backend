@@ -20,29 +20,23 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
+    # Disable CSRF protection
+    csrf_protection=False,
+    redirect_slashes=False,
 )
 
 # CORS configuration
-_extra_origins = os.getenv("CORS_ORIGINS", "")
-_extra_list = [o.strip().rstrip("/") for o in _extra_origins.split(",") if o.strip()]
-
-origins = [
-    settings.frontend_url.rstrip("/"),
+allow_origins=[
     "https://greenify-frontend-five.vercel.app",
-    "https://greenify-app.vercel.app",
+    "https://greenify-frontend.vercel.app",
     "http://localhost:5173",
-    "http://localhost:3000",
-] + _extra_list
-
-# Deduplicate origins while preserving order
-origins = list(dict.fromkeys(origins))
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=allow_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 

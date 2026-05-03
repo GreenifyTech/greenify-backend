@@ -12,12 +12,12 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[CategoryResponse])
+@router.get("", response_model=list[CategoryResponse])
 def categories_list(db: Session = Depends(get_db)):
     return list_categories(db=db)
 
 
-@router.post("/", response_model=CategoryResponse, status_code=201)
+@router.post("", response_model=CategoryResponse, status_code=201)
 def categories_create(
     payload: CategoryCreate,
     db: Session = Depends(get_db),

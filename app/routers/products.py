@@ -19,7 +19,7 @@ from app.services.cloudinary_service import upload_image
 router = APIRouter(prefix="/api/products", tags=["Products"])
 
 
-@router.get("/", response_model=ProductListResponse)
+@router.get("", response_model=ProductListResponse)
 def products_list(
     db: Session = Depends(get_db),
     search: Optional[str] = Query(None),
@@ -78,12 +78,12 @@ def get_product_viewers(product_id: int, request: Request):
     return {"live_viewers": count}
 
 
-@router.get("/{product_id}/", response_model=ProductResponse)
+@router.get("/{product_id}", response_model=ProductResponse)
 def product_get(product_id: int, db: Session = Depends(get_db)):
     return get_product(db=db, product_id=product_id)
 
 
-@router.post("/", response_model=ProductResponse, status_code=201)
+@router.post("", response_model=ProductResponse, status_code=201)
 def product_create(
     category_id: int = Form(...),
     name: str = Form(...),
@@ -129,7 +129,7 @@ def product_create(
     return create_product(db=db, payload=payload)
 
 
-@router.put("/{product_id}/", response_model=ProductResponse)
+@router.put("/{product_id}", response_model=ProductResponse)
 def product_update(
     product_id: int,
     name: Optional[str] = Form(None),
@@ -178,7 +178,7 @@ def product_update(
     return update_product(db=db, product_id=product_id, payload=payload)
 
 
-@router.delete("/{product_id}/", status_code=204)
+@router.delete("/{product_id}", status_code=204)
 def product_delete(
     product_id: int,
     db: Session = Depends(get_db),

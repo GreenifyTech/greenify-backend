@@ -16,7 +16,7 @@ from app.services.cart_service import (
 router = APIRouter(prefix="/api/cart", tags=["Cart"])
 
 
-@router.get("/", response_model=CartResponse)
+@router.get("", response_model=CartResponse)
 def cart_get(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -58,7 +58,7 @@ def cart_remove(
     remove_item(db=db, user=user, item_id=item_id)
 
 
-@router.delete("/", status_code=204)
+@router.delete("", status_code=204)
 def cart_clear(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),

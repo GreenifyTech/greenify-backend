@@ -10,7 +10,7 @@ from app.services.order_service import get_my_orders, get_order_by_id, place_ord
 router = APIRouter(prefix="/api/orders", tags=["Orders"])
 
 
-@router.post("/", response_model=OrderCreateResponse, status_code=201)
+@router.post("", response_model=OrderCreateResponse, status_code=201)
 def orders_place(
     payload: OrderCreate,
     db: Session = Depends(get_db),

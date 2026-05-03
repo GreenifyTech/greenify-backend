@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, UploadFile, File, Form, HTTPException, status
+from fastapi import APIRouter, Depends, Query, UploadFile, File, Form, HTTPException, status, Request
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_admin
@@ -44,6 +44,38 @@ def products_list(
         product_type=product_type,
         include_inactive=include_inactive,
     )
+
+
+from datetime import datetime, timedelta
+
+# In-memory storage for live viewers: {product_id: {client_ip: last_seen}}
+viewers_data = {}
+
+@router.get("/{product_id}/live-viewers")
+def get_product_viewers(product_id: int, request: Request):
+    """
+    Tracks and returns the number of active viewers for a product.
+    Uses client IP as a unique identifier for simplicity.
+    """
+    client_host = request.client.host
+    now = datetime.utcnow()
+    
+    if product_id not in viewers_data:
+        viewers_data[product_id] = {}
+    
+    # Register/Update current viewer
+    viewers_data[product_id][client_host] = now
+    
+    # Cleanup viewers who haven't polled in the last 60 seconds
+    threshold = now - timedelta(seconds=60)
+    viewers_data[product_id] = {
+        ip: ts for ip, ts in viewers_data[product_id].items() if ts > threshold
+    }
+    
+    # Ensure at least 1 (the current user)
+    count = max(1, len(viewers_data[product_id]))
+    
+    return {"live_viewers": count}
 
 
 @router.get("/{product_id}/", response_model=ProductResponse)

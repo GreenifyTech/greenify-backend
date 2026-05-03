@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.models.category import Category
 from app.models.product import Product
-from app.schemas.product import CategoryCreate, ProductCreate, ProductUpdate
+from app.schemas.product import CategoryCreate, CategoryUpdate, ProductCreate, ProductUpdate
 from app.core.utils import slugify
 
 
@@ -20,6 +20,20 @@ def create_category(db: Session, payload: CategoryCreate) -> Category:
         raise HTTPException(status_code=400, detail="Category already exists")
     category = Category(name=payload.name, description=payload.description)
     db.add(category)
+    db.commit()
+    db.refresh(category)
+    return category
+
+
+def update_category(db: Session, category_id: int, payload: CategoryUpdate) -> Category:
+    category = db.query(Category).filter(Category.id == category_id).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    data = payload.model_dump(exclude_unset=True)
+    for field, value in data.items():
+        setattr(category, field, value)
+        
     db.commit()
     db.refresh(category)
     return category

@@ -6,6 +6,11 @@ from app.database import get_db
 from app.schemas.product import CategoryCreate, CategoryUpdate, CategoryResponse
 from app.services.product_service import create_category, list_categories, update_category
 
+router = APIRouter(
+    prefix="/api/categories",
+    tags=["categories"]
+)
+
 
 @router.get("/", response_model=list[CategoryResponse])
 def categories_list(db: Session = Depends(get_db)):
